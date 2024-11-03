@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,19 +8,30 @@ public class AStarPathfinding : MonoBehaviour {
     public GameObject target;
 
     void Start() {
+        character = gameObject;
+    }
+    
+    void Update() {
         FindPath();
+
     }
 
+
+
     void FindPath() {
+
         Vector3Int startTilePos = graphVisualizer.tilemap.WorldToCell(character.transform.position);
         Vector3Int targetTilePos = graphVisualizer.tilemap.WorldToCell(target.transform.position);
 
         // Obtener los nodos del TileGraphVisualizer
-        TileNode startNode = graphVisualizer.GetNodeAtPosition(new Vector2Int(startTilePos.x, startTilePos.y));
+        TileNode startNode = graphVisualizer.GetNodeAtPosition(new Vector2Int(startTilePos.x , startTilePos.y ));
         TileNode goalNode = graphVisualizer.GetNodeAtPosition(new Vector2Int(targetTilePos.x, targetTilePos.y));
+        Debug.Log(startNode.position);
+        Debug.Log(goalNode.position);
 
         if (startNode != null && goalNode != null) {
             List<TileNode> path = AStarSearch(startNode, goalNode);
+
 
             if (path != null) {
                 StartCoroutine(MoveAlongPath(path));

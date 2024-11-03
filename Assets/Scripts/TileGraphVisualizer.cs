@@ -7,7 +7,7 @@ public class TileGraphVisualizer : MonoBehaviour
     public Tilemap tilemap;  // El Tilemap de Unity
 
     public bool draw = true;
-    private Dictionary<Vector2Int, TileNode> nodes = new Dictionary<Vector2Int, TileNode>();
+    public Dictionary<Vector2Int, TileNode> nodes = new Dictionary<Vector2Int, TileNode>();
 
     // Color para dibujar los nodos y las conexiones
     public Color nodeColor = Color.red;
