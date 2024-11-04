@@ -1,125 +1,177 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
-public class AStarPathfinding : MonoBehaviour {
-    public TileGraphVisualizer graphVisualizer;  // Referencia al visualizador del grafo
-    public GameObject character;
-    public GameObject target;
+public class AStar : MonoBehaviour
+{
 
-    void Start() {
-        character = gameObject;
-    }
-    
-    void Update() {
-        FindPath();
+    public Transform character;
+    public Transform target;
 
-    }
+    public Tilemap tilemap;
 
+    TileGraphVisualizer graphVisualizer;
+
+    private bool foundPath = false;
 
 
-    void FindPath() {
-
-        Vector3Int startTilePos = graphVisualizer.tilemap.WorldToCell(character.transform.position);
-        Vector3Int targetTilePos = graphVisualizer.tilemap.WorldToCell(target.transform.position);
-
-        // Obtener los nodos del TileGraphVisualizer
-        TileNode startNode = graphVisualizer.GetNodeAtPosition(new Vector2Int(startTilePos.x , startTilePos.y ));
-        TileNode goalNode = graphVisualizer.GetNodeAtPosition(new Vector2Int(targetTilePos.x, targetTilePos.y));
-        Debug.Log(startNode.position);
-        Debug.Log(goalNode.position);
-
-        if (startNode != null && goalNode != null) {
-            List<TileNode> path = AStarSearch(startNode, goalNode);
+    void Start()
+    {
+        graphVisualizer = FindObjectOfType<TileGraphVisualizer>();
 
 
-            if (path != null) {
-                StartCoroutine(MoveAlongPath(path));
-            }
-        }
+
+
     }
 
-    // Implementación del algoritmo A*
-    List<TileNode> AStarSearch(TileNode startNode, TileNode goalNode) {
-        List<TileNode> openList = new List<TileNode>();
-        HashSet<TileNode> closedList = new HashSet<TileNode>();
+    void Update()
+    {
+            // Verifica que el grafo haya sido generado
+        if (graphVisualizer != null && graphVisualizer.nodes != null && !foundPath)
+        {
+            // Obtener la referencia de TileGraphVisualizer
 
-        Dictionary<TileNode, TileNode> cameFrom = new Dictionary<TileNode, TileNode>();
-        Dictionary<TileNode, float> gCost = new Dictionary<TileNode, float>();
-        Dictionary<TileNode, float> fCost = new Dictionary<TileNode, float>();
+            Vector2Int start = (Vector2Int)tilemap.WorldToCell(character.position);
+            Vector2Int end = (Vector2Int)tilemap.WorldToCell(target.position);
 
-        foreach (TileNode node in graphVisualizer.nodes.Values) {
-            gCost[node] = Mathf.Infinity;
-            fCost[node] = Mathf.Infinity;
-        }
+            TileNode startNode = graphVisualizer.GetNodeAtPosition(start);
+            TileNode goalNode = graphVisualizer.GetNodeAtPosition(end);
 
-        gCost[startNode] = 0;
-        fCost[startNode] = Heuristic(startNode, goalNode);
+            if (startNode != null && goalNode != null)
+            {
+                List<TileNode> path = FindPath(startNode, goalNode);
 
-        openList.Add(startNode);
+                if (path != null)
+                {
+                    Debug.Log("Camino encontrado!");
+                    printPath(path);
+                    moveByPath(path);
+                    foundPath = true;
 
-        while (openList.Count > 0) {
-            TileNode current = GetLowestFCostNode(openList, fCost);
-
-            if (current == goalNode) {
-                return ReconstructPath(cameFrom, current);
-            }
-
-            openList.Remove(current);
-            closedList.Add(current);
-
-            foreach (TileNode neighbor in current.neighbors) {
-                if (closedList.Contains(neighbor)) continue;
-
-                float tentativeGCost = gCost[current] + Heuristic(current, neighbor);
-
-                if (tentativeGCost < gCost[neighbor]) {
-                    cameFrom[neighbor] = current;
-                    gCost[neighbor] = tentativeGCost;
-                    fCost[neighbor] = gCost[neighbor] + Heuristic(neighbor, goalNode);
-
-                    if (!openList.Contains(neighbor)) {
-                        openList.Add(neighbor);
-                    }
+                }
+                else
+                {
+                    Debug.Log("No se encontró un camino.");
                 }
             }
+
         }
 
-        return null;  // No se encontró un camino
     }
 
-    // Función heurística (distancia Euclidiana)
-    float Heuristic(TileNode a, TileNode b) {
-        return Vector2Int.Distance(a.position, b.position);
-    }
+    public static List<TileNode> FindPath(TileNode startNode, TileNode goalNode)
+    {
+        // Crear las listas abiertas y cerradas
+        List<NodeRecord> openList = new List<NodeRecord>();
+        List<NodeRecord> closedList = new List<NodeRecord>();
 
-    TileNode GetLowestFCostNode(List<TileNode> openList, Dictionary<TileNode, float> fCost) {
-        TileNode lowest = openList[0];
-        foreach (TileNode node in openList) {
-            if (fCost[node] < fCost[lowest]) {
-                lowest = node;
+        // Crear el NodeRecord para el nodo inicial
+        NodeRecord startRecord = new NodeRecord(startNode, null, 0, Heuristic(startNode, goalNode));
+        openList.Add(startRecord);
+
+        NodeRecord current = null;
+
+        // Iterar mientras haya nodos por explorar
+        while (openList.Count > 0)
+        {
+            // Obtener el nodo con menor estimatedTotalCost
+            current = GetLowestCostNode(openList);
+
+            // Si hemos llegado al nodo objetivo, terminamos
+            if (current.node == goalNode)
+                break;
+
+            // Obtener las conexiones (vecinos)
+            foreach (Edge connection in current.node.neighbors)
+            {
+                TileNode endNode = connection.to;
+                float endNodeCost = current.costSoFar + connection.cost;
+
+                // Buscar en la lista cerrada
+                NodeRecord endNodeRecord = closedList.Find(record => record.node == endNode);
+
+                // Si el nodo está en la lista cerrada y el costo es peor, continuar
+                if (endNodeRecord != null && endNodeRecord.costSoFar <= endNodeCost)
+                    continue;
+
+                // Si no está en la lista abierta o cerrada, crear un nuevo record
+                if (endNodeRecord == null)
+                {
+                    endNodeRecord = new NodeRecord(endNode, connection, endNodeCost, endNodeCost + Heuristic(endNode, goalNode));
+                    openList.Add(endNodeRecord);
+                }
+                else
+                {
+                    // Si ya está en la lista, actualizar el costo si es mejor
+                    endNodeRecord.connection = connection;
+                    endNodeRecord.costSoFar = endNodeCost;
+                    endNodeRecord.estimatedTotalCost = endNodeCost + Heuristic(endNode, goalNode);
+                }
             }
-        }
-        return lowest;
-    }
 
-    List<TileNode> ReconstructPath(Dictionary<TileNode, TileNode> cameFrom, TileNode current) {
+            // Mover el nodo actual a la lista cerrada
+            openList.Remove(current);
+            closedList.Add(current);
+        }
+
+        // Si no encontramos el objetivo
+        if (current.node != goalNode)
+        {
+            Debug.Log("No se encontró un camino.");
+            return null;
+        }
+
+        // Reconstruir el camino
         List<TileNode> path = new List<TileNode>();
-        while (cameFrom.ContainsKey(current)) {
-            path.Add(current);
-            current = cameFrom[current];
+        while (current.node != startNode)
+        {
+            path.Add(current.node);
+            current = closedList.Find(record => record.node == current.connection.from);
         }
         path.Reverse();
         return path;
     }
 
-    IEnumerator MoveAlongPath(List<TileNode> path) {
-        foreach (TileNode node in path) {
-            Vector3 worldPos = graphVisualizer.tilemap.GetCellCenterWorld(new Vector3Int(node.position.x, node.position.y, 0));
-            while (Vector3.Distance(character.transform.position, worldPos) > 0.1f) {
-                character.transform.position = Vector3.MoveTowards(character.transform.position, worldPos, Time.deltaTime * 5f);
-                yield return null;
+    // Heurística: Usamos la distancia Manhattan para grids
+    private static float Heuristic(TileNode fromNode, TileNode toNode)
+    {
+        return Mathf.Abs(fromNode.position.x - toNode.position.x) + Mathf.Abs(fromNode.position.y - toNode.position.y);
+    }
+
+    // Obtener el nodo con menor costo estimado de la lista abierta
+    private static NodeRecord GetLowestCostNode(List<NodeRecord> list)
+    {
+        NodeRecord lowest = list[0];
+        foreach (NodeRecord record in list)
+        {
+            if (record.estimatedTotalCost < lowest.estimatedTotalCost)
+            {
+                lowest = record;
             }
+        }
+        return lowest;
+    }
+
+    void printPath(List<TileNode> path)
+    {
+        string result = "Camino encontrado: \n";
+
+        foreach (TileNode node in path)
+        {
+            result += node.position.ToString() + ",";
+        }
+
+        result += "\n";
+
+        Debug.Log(result);
+    }
+
+
+    void moveByPath(List<TileNode> path) {
+
+        foreach (TileNode node in path) {
+            Vector3 posToMove = tilemap.GetCellCenterWorld((Vector3Int) node.position);
+            Debug.Log(posToMove);
         }
     }
 }

@@ -4,7 +4,8 @@ using UnityEngine.Tilemaps;
 
 public class TileGraphVisualizer : MonoBehaviour
 {
-    public Tilemap tilemap;  // El Tilemap de Unity
+    public Tilemap tilemap;
+    public TextMesh textMesh; // El Tilemap de Unity
 
     public bool draw = true;
     public Dictionary<Vector2Int, TileNode> nodes = new Dictionary<Vector2Int, TileNode>();
@@ -35,28 +36,37 @@ public class TileGraphVisualizer : MonoBehaviour
                 {
                     TileNode node = new TileNode(gridPos);
                     nodes.Add(gridPos, node);
+                    CreateTextAtNode(node);
                 }
 
-                // Conectar con los vecinos
-                ConnectNeighbors(gridPos);
+
             }
         }
+
+        // Conectar con los vecinos
+        ConnectNeighbors();
     }
 
-    void ConnectNeighbors(Vector2Int pos)
+    void ConnectNeighbors()
     {
         Vector2Int[] directions = {
             Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right
         };
-
-        foreach (Vector2Int direction in directions)
+        foreach (KeyValuePair<Vector2Int, TileNode> kvp in nodes)
         {
-            Vector2Int neighborPos = pos + direction;
-            if (nodes.ContainsKey(neighborPos))
+            foreach (Vector2Int direction in directions)
             {
-                nodes[pos].AddNeighbor(nodes[neighborPos]);
+                Vector2Int neighborPos = kvp.Key + direction;
+
+                if (nodes.ContainsKey(neighborPos))
+                {
+                    nodes[kvp.Key].AddNeighbor(nodes[neighborPos]);
+                }
+
             }
+
         }
+
     }
 
     // Devuelve el nodo asociado a una posición del Tilemap
@@ -64,7 +74,27 @@ public class TileGraphVisualizer : MonoBehaviour
     {
         return nodes.ContainsKey(position) ? nodes[position] : null;
     }
+
     // Dibuja los Gizmos para visualizar el grafo en el Editor
+
+    void CreateTextAtNode(TileNode node)
+    {
+        // Crear un nuevo GameObject para contener el TextMesh
+        GameObject textObject = new GameObject("NodeCoordinates");
+
+        // Añadir un componente TextMesh para mostrar texto en el mundo
+        TextMesh textMesh = textObject.AddComponent<TextMesh>();
+
+        // Asignar las coordenadas del nodo como texto
+        textMesh.text = $"({node.position.x}, {node.position.y})";
+
+        // Posicionar el texto en el mundo, un poco por encima del nodo
+        textObject.transform.position = new Vector3(node.position.x, node.position.y + 0.5f, 0f);
+
+        // Ajustar el tamaño y la apariencia del texto
+        textMesh.characterSize = 0.2f;
+        textMesh.color = Color.white;  // Puedes cambiar el color del texto aquí
+    }
     void OnDrawGizmos()
     {
         if (nodes == null || nodes.Count == 0 || !draw) return;
@@ -76,17 +106,20 @@ public class TileGraphVisualizer : MonoBehaviour
 
             // Dibujar una esfera en el centro del nodo
             Gizmos.color = nodeColor;
-            Gizmos.DrawSphere(worldPos, 0.1f);  // Radio de la esfera 0.1f
+            Gizmos.DrawSphere(worldPos, 0.05f);
+            // Configurar el texto inicial
 
             // Dibujar las conexiones a los vecinos
             Gizmos.color = connectionColor;
             foreach (var neighbor in node.neighbors)
             {
-                Vector3 neighborWorldPos = tilemap.GetCellCenterWorld(new Vector3Int(neighbor.position.x, neighbor.position.y, 0));
+                Vector3 neighborWorldPos = tilemap.GetCellCenterWorld(new Vector3Int(neighbor.to.position.x, neighbor.to.position.y, 0));
                 Gizmos.DrawLine(worldPos, neighborWorldPos);  // Dibuja una línea entre el nodo y su vecino
             }
         }
     }
+
+    
 
 
 }
