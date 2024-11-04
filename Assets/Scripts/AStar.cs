@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -12,21 +13,22 @@ public class AStar : MonoBehaviour
 
     TileGraphVisualizer graphVisualizer;
 
-    private bool foundPath = false;
+    public bool foundPath = false;
+
+    private KinematicArrive movement;
 
 
     void Start()
     {
         graphVisualizer = FindObjectOfType<TileGraphVisualizer>();
-
-
+        movement = FindObjectOfType<KinematicArrive>();
 
 
     }
 
     void Update()
     {
-            // Verifica que el grafo haya sido generado
+        // Verifica que el grafo haya sido generado
         if (graphVisualizer != null && graphVisualizer.nodes != null && !foundPath)
         {
             // Obtener la referencia de TileGraphVisualizer
@@ -45,7 +47,7 @@ public class AStar : MonoBehaviour
                 {
                     Debug.Log("Camino encontrado!");
                     printPath(path);
-                    moveByPath(path);
+                    StartCoroutine(MoveByPath(path));
                     foundPath = true;
 
                 }
@@ -166,12 +168,35 @@ public class AStar : MonoBehaviour
         Debug.Log(result);
     }
 
+    IEnumerator MoveByPath(List<TileNode> path)
+    {
+        GameObject positionObject = new GameObject("PositionToMove");
 
-    void moveByPath(List<TileNode> path) {
+        foreach (TileNode node in path)
+        {
+            // Obtener la posición del centro del TileNode en el mundo
+            Vector3 posToMove = tilemap.GetCellCenterWorld((Vector3Int)node.position);
+            positionObject.transform.position = posToMove;
 
-        foreach (TileNode node in path) {
-            Vector3 posToMove = tilemap.GetCellCenterWorld((Vector3Int) node.position);
-            Debug.Log(posToMove);
+            // Asignar el nuevo objetivo al movementArrive
+            movement.target = positionObject.transform;
+            movement.arrive = false;
+
+            // Esperar hasta que el personaje llegue al nodo
+            yield return StartCoroutine(WaitUntilArrived());
         }
+
+        Debug.Log("Camino completado");
     }
+
+    IEnumerator WaitUntilArrived()
+    {
+        // Esperar hasta que la distancia al objetivo sea lo suficientemente pequeña
+        while (!movement.arrive)
+        {
+            yield return null;  // Espera un frame y vuelve a comprobar
+        }
+
+    }
+
 }

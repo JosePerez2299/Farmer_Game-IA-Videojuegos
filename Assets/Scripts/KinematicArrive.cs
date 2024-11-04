@@ -12,19 +12,22 @@ public class KinematicArrive : MonoBehaviour
 
     public float radius, timeToTarget;
 
-    private NewOrientation orientation;
+    public bool arrive = false;
+
 
     // Start is called before the first frame update
     void Start()
     {
         character = transform;
-        orientation = gameObject.AddComponent<NewOrientation>();
         rb = GetComponent<Rigidbody2D>();
+        gameObject.AddComponent<KinematicSteeringOutput>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (target == null) return;
+
         Vector2 velocity = getSteering().velocity;
         rb.velocity = velocity;
     }
@@ -38,6 +41,7 @@ public class KinematicArrive : MonoBehaviour
         if (result.velocity.magnitude < radius)
         {
             result.velocity = new Vector2(0, 0);
+            arrive = true;
             return result;
         }
 
@@ -48,12 +52,6 @@ public class KinematicArrive : MonoBehaviour
             result.velocity.Normalize();
             result.velocity *= maxSpeed;
         }
-
-        float newOrientation = orientation.Calculate(character.eulerAngles.z, result.velocity);
-
-        character.eulerAngles = new Vector3(0, 0, newOrientation);
-
-
         result.rotation = 0;
 
         return result;
