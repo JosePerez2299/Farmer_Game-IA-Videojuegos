@@ -18,9 +18,12 @@ public class LookWhereYoureGoing : Align
     // Update is called once per frame
     void Update()
     {
-                // Llamar a getSteering para ajustar la orientación hacia el objetivo
+        if (target == null) {
+            return;
+        }
+        // Llamar a getSteering para ajustar la orientación hacia el objetivo
         SteeringOutput steering = getSteering();
-        
+
         // Si no se necesita más rotación, mantener la orientación actual
         if (steering == null)
         {
@@ -35,10 +38,11 @@ public class LookWhereYoureGoing : Align
     }
 
     public new SteeringOutput getSteering()
-    {   
+    {
         Vector3 velocity = rb.velocity;
         // Calcular la dirección hacia el objetivo
-        if (velocity.magnitude == 0){
+        if (velocity.magnitude == 0)
+        {
             return null;
         }
 

@@ -36,7 +36,7 @@ public class TileGraphVisualizer : MonoBehaviour
                 {
                     TileNode node = new TileNode(gridPos);
                     nodes.Add(gridPos, node);
-                    CreateTextAtNode(node);
+                    // CreateTextAtNode(node);
                 }
 
 
@@ -106,7 +106,7 @@ public class TileGraphVisualizer : MonoBehaviour
 
             // Dibujar una esfera en el centro del nodo
             Gizmos.color = nodeColor;
-            Gizmos.DrawSphere(worldPos, 0.05f);
+            Gizmos.DrawSphere(worldPos, 0.15f);
             // Configurar el texto inicial
 
             // Dibujar las conexiones a los vecinos

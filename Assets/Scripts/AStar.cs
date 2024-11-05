@@ -17,11 +17,17 @@ public class AStar : MonoBehaviour
 
     private KinematicArrive movement;
 
+    private LookWhereYoureGoing LWYG;
+
+    private  GameObject positionObject;
+
 
     void Start()
     {
         graphVisualizer = FindObjectOfType<TileGraphVisualizer>();
         movement = FindObjectOfType<KinematicArrive>();
+        LWYG = FindObjectOfType<LookWhereYoureGoing>();
+        positionObject = new GameObject("PositionToMove");
 
 
     }
@@ -45,7 +51,6 @@ public class AStar : MonoBehaviour
 
                 if (path != null)
                 {
-                    Debug.Log("Camino encontrado!");
                     printPath(path);
                     StartCoroutine(MoveByPath(path));
                     foundPath = true;
@@ -170,14 +175,15 @@ public class AStar : MonoBehaviour
 
     IEnumerator MoveByPath(List<TileNode> path)
     {
-        GameObject positionObject = new GameObject("PositionToMove");
+
+   
 
         foreach (TileNode node in path)
         {
             // Obtener la posición del centro del TileNode en el mundo
             Vector3 posToMove = tilemap.GetCellCenterWorld((Vector3Int)node.position);
             positionObject.transform.position = posToMove;
-
+            LWYG.target = positionObject.transform;
             // Asignar el nuevo objetivo al movementArrive
             movement.target = positionObject.transform;
             movement.arrive = false;
@@ -186,7 +192,6 @@ public class AStar : MonoBehaviour
             yield return StartCoroutine(WaitUntilArrived());
         }
 
-        Debug.Log("Camino completado");
     }
 
     IEnumerator WaitUntilArrived()
