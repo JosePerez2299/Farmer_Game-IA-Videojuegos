@@ -32,7 +32,7 @@ public class DynamicFlee : MonoBehaviour
         kinematic.UpdateKinematic(steering, maxSpeed);
 
         if (steering.linear == Vector2.zero) kinematic.velocity = Vector2.zero;
-        rb.velocity = kinematic.velocity;
+        rb.linearVelocity = kinematic.velocity;
 
     }
 

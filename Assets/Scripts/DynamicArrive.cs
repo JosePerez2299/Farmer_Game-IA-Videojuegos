@@ -37,10 +37,10 @@ public class DynamicArrive : MonoBehaviour
             character.position = kinematic.position;
             rb.rotation = kinematic.rotation;
             rb.angularVelocity = kinematic.orientation;
-            rb.velocity = kinematic.velocity;
-            character.eulerAngles = new Vector3(0, 0, orientation.Calculate(character.eulerAngles.z, rb.velocity));
+            rb.linearVelocity = kinematic.velocity;
+            character.eulerAngles = new Vector3(0, 0, orientation.Calculate(character.eulerAngles.z, rb.linearVelocity));
         }
-        else rb.velocity = Vector2.zero;
+        else rb.linearVelocity = Vector2.zero;
 
 
 
@@ -73,7 +73,7 @@ public class DynamicArrive : MonoBehaviour
         targetVelocity.Normalize();
         targetVelocity *= targetSpeed;
 
-        result.linear = targetVelocity - rb.velocity;
+        result.linear = targetVelocity - rb.linearVelocity;
         result.linear /= timeToTarget;
 
         if (result.linear.magnitude > maxAcceleration)

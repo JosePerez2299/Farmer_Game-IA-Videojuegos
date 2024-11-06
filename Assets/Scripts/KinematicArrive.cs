@@ -29,7 +29,7 @@ public class KinematicArrive : MonoBehaviour
         if (target == null) return;
 
         Vector2 velocity = getSteering().velocity;
-        rb.velocity = velocity;
+        rb.linearVelocity = velocity;
     }
 
 

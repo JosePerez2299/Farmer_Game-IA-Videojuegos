@@ -28,13 +28,13 @@ public class VelocityMatching : MonoBehaviour
     {
         SteeringOutput steering = getSteering();
         kinematic.UpdateKinematic(steering, 40);
-        rbCharacter.velocity = kinematic.velocity;
+        rbCharacter.linearVelocity = kinematic.velocity;
 
     }
 
     SteeringOutput getSteering()
     {
-        result.linear = rbTarget.velocity - rbCharacter.velocity;
+        result.linear = rbTarget.linearVelocity - rbCharacter.linearVelocity;
         result.linear /= timeToTarget;
 
         if (result.linear.magnitude > maxAcceleration)

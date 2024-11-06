@@ -26,11 +26,11 @@ public class PlantCorn : MonoBehaviour
 
     void Update()
     {
-        // if (!sleepScareBird.sleeping)
-        // {
-        //     stateMachine.ChangeState(stateMachine.hide);
-        //     return;
-        // }
+        if (!sleepScareBird.sleeping)
+        {
+            stateMachine.ChangeState(stateMachine.hide);
+            return;
+        }
         food = GameObject.FindGameObjectWithTag("NoRice");
 
         if (food == null)

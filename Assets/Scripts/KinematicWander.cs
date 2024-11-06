@@ -20,7 +20,7 @@ public class KinematicWander : MonoBehaviour
     void Update()
     {
         result = GetSteering();
-        rb.velocity = result.velocity;
+        rb.linearVelocity = result.velocity;
         rb.rotation = result.rotation;
 
 

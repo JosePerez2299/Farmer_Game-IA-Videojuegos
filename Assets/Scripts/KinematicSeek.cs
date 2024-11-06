@@ -23,7 +23,7 @@ public class KinematicSeek : MonoBehaviour
     void Update()
     {
         Vector2 velocity = funSteeringOutput().velocity;
-        rb.velocity = velocity;
+        rb.linearVelocity = velocity;
     }
 
     KinematicSteeringOutput funSteeringOutput()

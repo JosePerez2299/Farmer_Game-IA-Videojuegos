@@ -28,11 +28,11 @@ public class RefillFarm : MonoBehaviour
 
     void Update()
     {
-        // if (!sleepScareBird.sleeping)
-        // {
-        //     stateMachine.ChangeState(stateMachine.hide);
-        //     return;
-        // }
+        if (!sleepScareBird.sleeping)
+        {
+            stateMachine.ChangeState(stateMachine.hide);
+            return;
+        }
 
         food = GameObject.FindGameObjectsWithTag("NoRice");
         if (food != null && food.Length >= 4)

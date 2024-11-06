@@ -30,9 +30,9 @@ public class DynamicSeek : MonoBehaviour
     {
         SteeringOutput steering = getSteering();
         kinematic.UpdateKinematic(steering, maxSpeed);
-        rb.velocity = kinematic.velocity;
+        rb.linearVelocity = kinematic.velocity;
         NewOrientation orientation = GetComponent<NewOrientation>();
-        character.eulerAngles = new Vector3(0,0,orientation.Calculate(character.eulerAngles.z, rb.velocity));
+        character.eulerAngles = new Vector3(0,0,orientation.Calculate(character.eulerAngles.z, rb.linearVelocity));
     }
 
     public SteeringOutput getSteering()

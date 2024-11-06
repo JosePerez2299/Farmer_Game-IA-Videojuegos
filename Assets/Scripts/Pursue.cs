@@ -22,7 +22,7 @@ public class Pursue : DynamicSeek
     {
         SteeringOutput steering = getSteering();
         kinematic.UpdateKinematic(steering, maxSpeed);
-        rb.velocity = kinematic.velocity;
+        rb.linearVelocity = kinematic.velocity;
 
     }
 
@@ -31,7 +31,7 @@ public class Pursue : DynamicSeek
 
         Vector2 direction = target.position - transform.position;
         float distance = direction.magnitude;
-        float speed = rb.velocity.magnitude;
+        float speed = rb.linearVelocity.magnitude;
 
         float prediction;
 
@@ -44,7 +44,7 @@ public class Pursue : DynamicSeek
             prediction = distance / speed;
         }
 
-        newTargetPrediction = rbTarget.velocity * prediction;
+        newTargetPrediction = rbTarget.linearVelocity * prediction;
 
 
         return base.getSteering();

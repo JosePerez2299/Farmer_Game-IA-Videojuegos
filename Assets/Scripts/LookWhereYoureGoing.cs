@@ -39,7 +39,7 @@ public class LookWhereYoureGoing : Align
 
     public new SteeringOutput getSteering()
     {
-        Vector3 velocity = rb.velocity;
+        Vector3 velocity = rb.linearVelocity;
         // Calcular la dirección hacia el objetivo
         if (velocity.magnitude == 0)
         {

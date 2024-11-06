@@ -25,7 +25,7 @@ public class Evade : DynamicFlee
         kinematic.UpdateKinematic(steering, maxSpeed);
 
         if (steering.linear == Vector2.zero) kinematic.velocity = Vector2.zero;
-        rb.velocity = kinematic.velocity;
+        rb.linearVelocity = kinematic.velocity;
 
 
     }
@@ -35,7 +35,7 @@ public class Evade : DynamicFlee
 
         Vector2 direction = transform.position - target.position ;
         float distance = direction.magnitude;
-        float speed = rb.velocity.magnitude;
+        float speed = rb.linearVelocity.magnitude;
 
         float prediction;
 
@@ -48,7 +48,7 @@ public class Evade : DynamicFlee
             prediction = distance / speed;
         }
 
-        newTargetPrediction = rbTarget.velocity * prediction;
+        newTargetPrediction = rbTarget.linearVelocity * prediction;
 
 
         return base.getSteering();

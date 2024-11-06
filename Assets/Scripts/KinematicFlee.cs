@@ -22,7 +22,7 @@ public class KinematicFlee : MonoBehaviour
     void Update()
     {
         Vector2 velocity = getSteering().velocity;
-        rb.velocity = velocity;
+        rb.linearVelocity = velocity;
     }
 
 

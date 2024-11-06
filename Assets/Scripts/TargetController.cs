@@ -23,7 +23,7 @@ public class TargetController : MonoBehaviour
 
         Vector2 direction = new Vector2(movX, movY ); 
         Vector2 velocity = direction.normalized*maxSpeed;
-        rb.velocity = velocity;
-        rb.rotation = orientation.Calculate(rb.rotation, rb.velocity);
+        rb.linearVelocity = velocity;
+        rb.rotation = orientation.Calculate(rb.rotation, rb.linearVelocity);
     }
 }

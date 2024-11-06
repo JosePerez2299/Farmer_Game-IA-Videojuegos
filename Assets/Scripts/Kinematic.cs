@@ -16,7 +16,7 @@ public class Kinematic : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         character = transform;
-        velocity = rb.velocity;
+        velocity = rb.linearVelocity;
         position = rb.position;
         rotation = rb.rotation;
         orientation = rb.rotation;

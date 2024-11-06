@@ -9,64 +9,35 @@ public class MovementController : MonoBehaviour
     private Transform character, lastTarget;
     public Transform target;
 
-
     private TileGraphVisualizer graphVisualizer;
-
     private KinematicArrive movement;
-
     private LookWhereYoureGoing LWYG;
-
     private GameObject positionObject;
-
     private Tilemap tilemap;
-    // Start is called before the first frame update
+
+    private Coroutine currentMovementCoroutine;  // Para almacenar la corrutina actual
+
+    [System.Obsolete]
     void Start()
     {
         character = transform;
-        graphVisualizer = FindObjectOfType<TileGraphVisualizer>();
+        GameObject graph = GameObject.FindGameObjectWithTag("Map");
+
+        graphVisualizer = graph.GetComponent<TileGraphVisualizer>();
         movement = GetComponent<KinematicArrive>();
         positionObject = new GameObject("PositionToMove");
         aStar = GetComponent<AStar>();
         tilemap = aStar.tilemap;
-
-
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // if (target != lastTarget) {
-        //     aStar.foundPath = false;
-        // }
-
-        // if (graphVisualizer != null && graphVisualizer.nodes != null && !aStar.foundPath && target != null  )
-        // {
-        //     lastTarget = target;
-        //     Vector2Int start = (Vector2Int)tilemap.WorldToCell(character.position);
-        //     Vector2Int end = (Vector2Int)tilemap.WorldToCell(target.position);
-
-        //     TileNode startNode = graphVisualizer.GetNodeAtPosition(start);
-        //     TileNode goalNode = graphVisualizer.GetNodeAtPosition(end);
-
-        //     if (startNode != null && goalNode != null)
-        //     {
-        //         List<TileNode> path = aStar.FindPath(startNode, goalNode);
-
-        //         if (path != null)
-        //         {
-        //             printPath(path);
-        //             StartCoroutine(MoveByPath(path));
-        //             aStar.foundPath = true;
-
-        //         }
-        //         else
-        //         {
-        //             Debug.Log("No se encontró un camino.");
-        //         }
-        //     }
-        // }
-
-
+        // Si el target cambió y no es nulo, iniciar el movimiento
+        if (target != lastTarget && target != null)
+        {
+            lastTarget = target;
+            moveTo(target);
+        }
     }
 
     public void moveTo(Transform target)
@@ -76,16 +47,19 @@ public class MovementController : MonoBehaviour
         TileNode startNode = graphVisualizer.GetNodeAtPosition(start);
         TileNode goalNode = graphVisualizer.GetNodeAtPosition(end);
 
-       if (aStar.foundPath == true) {
-        return;
-       }
+        if (aStar.foundPath == true)
+        {
+            return;  // Si ya encontró un camino, no hacer nada
+        }
 
+        // Cancelar la corrutina de movimiento anterior si está activa
+        if (currentMovementCoroutine != null)
+        {
+            StopCoroutine(currentMovementCoroutine);
+        }
 
-
-        StartCoroutine(MoveByPath(aStar.FindPath(startNode, goalNode)));
-
-
-
+        // Iniciar la nueva corrutina para mover al personaje
+        currentMovementCoroutine = StartCoroutine(MoveByPath(aStar.FindPath(startNode, goalNode)));
     }
 
     void printPath(List<TileNode> path)
@@ -98,7 +72,6 @@ public class MovementController : MonoBehaviour
         }
 
         result += "\n";
-
         Debug.Log(result);
     }
 
@@ -109,8 +82,6 @@ public class MovementController : MonoBehaviour
             // Obtener la posición del centro del TileNode en el mundo
             Vector3 posToMove = tilemap.GetCellCenterWorld((Vector3Int)node.position);
             positionObject.transform.position = posToMove;
-            // LWYG.target = positionObject.transform;
-            // Asignar el nuevo objetivo al movementArrive
             movement.target = positionObject.transform;
             movement.arrive = false;
 
@@ -119,17 +90,14 @@ public class MovementController : MonoBehaviour
         }
 
         aStar.foundPath = false;
-
+        currentMovementCoroutine = null;  // Liberar la referencia de la corrutina actual
     }
 
     IEnumerator WaitUntilArrived()
     {
-        // Esperar hasta que la distancia al objetivo sea lo suficientemente pequeña
-        while (!movement.arrive)
+        while (!movement.arrive )
         {
-            yield return null;  // Espera un frame y vuelve a comprobar
+            yield return null;
         }
-
     }
 }
-
