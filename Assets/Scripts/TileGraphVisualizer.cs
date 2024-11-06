@@ -36,7 +36,6 @@ public class TileGraphVisualizer : MonoBehaviour
                 {
                     TileNode node = new TileNode(gridPos);
                     nodes.Add(gridPos, node);
-                    CreateTextAtNode(node);
                 }
 
 
@@ -95,6 +94,7 @@ public class TileGraphVisualizer : MonoBehaviour
         textMesh.characterSize = 0.2f;
         textMesh.color = Color.white;  // Puedes cambiar el color del texto aquí
     }
+
     void OnDrawGizmos()
     {
         if (nodes == null || nodes.Count == 0 || !draw) return;
@@ -119,7 +119,7 @@ public class TileGraphVisualizer : MonoBehaviour
         }
     }
 
-    
+
 
 
 }

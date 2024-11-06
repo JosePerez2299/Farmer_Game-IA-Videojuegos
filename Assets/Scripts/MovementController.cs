@@ -35,44 +35,56 @@ public class MovementController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (target != lastTarget) {
-            aStar.foundPath = false;
-        }
+        // if (target != lastTarget) {
+        //     aStar.foundPath = false;
+        // }
 
-        if (graphVisualizer != null && graphVisualizer.nodes != null && !aStar.foundPath && target != null  )
-        {
-            lastTarget = target;
-            Vector2Int start = (Vector2Int)tilemap.WorldToCell(character.position);
-            Vector2Int end = (Vector2Int)tilemap.WorldToCell(target.position);
+        // if (graphVisualizer != null && graphVisualizer.nodes != null && !aStar.foundPath && target != null  )
+        // {
+        //     lastTarget = target;
+        //     Vector2Int start = (Vector2Int)tilemap.WorldToCell(character.position);
+        //     Vector2Int end = (Vector2Int)tilemap.WorldToCell(target.position);
 
-            TileNode startNode = graphVisualizer.GetNodeAtPosition(start);
-            TileNode goalNode = graphVisualizer.GetNodeAtPosition(end);
+        //     TileNode startNode = graphVisualizer.GetNodeAtPosition(start);
+        //     TileNode goalNode = graphVisualizer.GetNodeAtPosition(end);
 
-            if (startNode != null && goalNode != null)
-            {
-                List<TileNode> path = aStar.FindPath(startNode, goalNode);
+        //     if (startNode != null && goalNode != null)
+        //     {
+        //         List<TileNode> path = aStar.FindPath(startNode, goalNode);
 
-                if (path != null)
-                {
-                    printPath(path);
-                    StartCoroutine(MoveByPath(path));
-                    aStar.foundPath = true;
+        //         if (path != null)
+        //         {
+        //             printPath(path);
+        //             StartCoroutine(MoveByPath(path));
+        //             aStar.foundPath = true;
 
-                }
-                else
-                {
-                    Debug.Log("No se encontró un camino.");
-                }
-            }
-        }
+        //         }
+        //         else
+        //         {
+        //             Debug.Log("No se encontró un camino.");
+        //         }
+        //     }
+        // }
 
 
     }
 
-    void changeTarget(Transform target)
+    public void moveTo(Transform target)
     {
-        this.target = target;
-        aStar.foundPath = false;
+        Vector2Int start = (Vector2Int)tilemap.WorldToCell(character.position);
+        Vector2Int end = (Vector2Int)tilemap.WorldToCell(target.position);
+        TileNode startNode = graphVisualizer.GetNodeAtPosition(start);
+        TileNode goalNode = graphVisualizer.GetNodeAtPosition(end);
+
+       if (aStar.foundPath == true) {
+        return;
+       }
+
+
+
+        StartCoroutine(MoveByPath(aStar.FindPath(startNode, goalNode)));
+
+
 
     }
 
@@ -92,6 +104,8 @@ public class MovementController : MonoBehaviour
 
     IEnumerator MoveByPath(List<TileNode> path)
     {
+        aStar.foundPath = true;
+
 
         foreach (TileNode node in path)
         {
@@ -106,6 +120,8 @@ public class MovementController : MonoBehaviour
             // Esperar hasta que el personaje llegue al nodo
             yield return StartCoroutine(WaitUntilArrived());
         }
+
+        aStar.foundPath = false;
 
     }
 

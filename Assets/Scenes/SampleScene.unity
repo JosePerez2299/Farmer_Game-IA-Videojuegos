@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 355064372}
   - component: {fileID: 355064375}
   m_Layer: 0
-  m_Name: rice04
+  m_Name: rice00
   m_TagString: Rice
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -640,6 +640,8 @@ GameObject:
   - component: {fileID: 1054206190}
   - component: {fileID: 1054206193}
   - component: {fileID: 1054206194}
+  - component: {fileID: 1054206196}
+  - component: {fileID: 1054206195}
   m_Layer: 0
   m_Name: Bird
   m_TagString: Bird
@@ -819,7 +821,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a618adaf4f278e544ba77b98138d5fc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 1771670245}
+--- !u!114 &1054206195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1054206185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a728d162dc9530b46b0979ff349d2dda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Depot: {fileID: 1062439804}
+--- !u!114 &1054206196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1054206185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c294dd0007bbf7408869e265ff3320a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialState: {fileID: 1054206195}
 --- !u!1 &1062439803
 GameObject:
   m_ObjectHideFlags: 0
@@ -832,7 +860,7 @@ GameObject:
   - component: {fileID: 1062439805}
   m_Layer: 0
   m_Name: birdHouse
-  m_TagString: Untagged
+  m_TagString: BirdHouse
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4750,7 +4778,7 @@ GameObject:
   - component: {fileID: 1418500129}
   m_Layer: 0
   m_Name: depot
-  m_TagString: Untagged
+  m_TagString: Depot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

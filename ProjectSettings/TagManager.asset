@@ -9,6 +9,8 @@ TagManager:
   - Map
   - Bird
   - Farmer
+  - Depot
+  - BirdHouse
   layers:
   - Default
   - TransparentFX

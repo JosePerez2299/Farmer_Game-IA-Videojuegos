@@ -8,19 +8,15 @@ public class RespawnableObject : MonoBehaviour
 
     private Renderer rend;
 
-    private Collider2D col;
-
 
     void Start()
     {
 
         rend = GetComponent<Renderer>();
-        col = GetComponent<Collider2D>();
 
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Disparo el trigger");
         if (other.CompareTag("Bird"))
         {
             Respawn(false);
@@ -38,6 +34,8 @@ public class RespawnableObject : MonoBehaviour
     {
         IsRespawned = state;
         rend.enabled = state;
+
+        if (state) transform.tag = "Rice"; else transform.tag = "NoRice";
 
     }
 }
