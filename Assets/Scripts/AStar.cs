@@ -6,67 +6,51 @@ using UnityEngine.Tilemaps;
 public class AStar : MonoBehaviour
 {
 
-    public Transform character;
-    public Transform target;
-
     public Tilemap tilemap;
-
-    TileGraphVisualizer graphVisualizer;
-
     public bool foundPath = false;
-
-    private KinematicArrive movement;
-
-    private LookWhereYoureGoing LWYG;
-
-    private  GameObject positionObject;
-
 
     void Start()
     {
-        graphVisualizer = FindObjectOfType<TileGraphVisualizer>();
-        movement = FindObjectOfType<KinematicArrive>();
-        LWYG = FindObjectOfType<LookWhereYoureGoing>();
-        positionObject = new GameObject("PositionToMove");
+ 
 
 
     }
 
-    void Update()
-    {
-        // Verifica que el grafo haya sido generado
-        if (graphVisualizer != null && graphVisualizer.nodes != null && !foundPath)
-        {
-            // Obtener la referencia de TileGraphVisualizer
+    // void Update()
+    // {
+    //     // Verifica que el grafo haya sido generado
+    //     if (graphVisualizer != null && graphVisualizer.nodes != null && !foundPath)
+    //     {
+    //         // Obtener la referencia de TileGraphVisualizer
 
-            Vector2Int start = (Vector2Int)tilemap.WorldToCell(character.position);
-            Vector2Int end = (Vector2Int)tilemap.WorldToCell(target.position);
+    //         Vector2Int start = (Vector2Int)tilemap.WorldToCell(character.position);
+    //         Vector2Int end = (Vector2Int)tilemap.WorldToCell(target.position);
 
-            TileNode startNode = graphVisualizer.GetNodeAtPosition(start);
-            TileNode goalNode = graphVisualizer.GetNodeAtPosition(end);
+    //         TileNode startNode = graphVisualizer.GetNodeAtPosition(start);
+    //         TileNode goalNode = graphVisualizer.GetNodeAtPosition(end);
 
-            if (startNode != null && goalNode != null)
-            {
-                List<TileNode> path = FindPath(startNode, goalNode);
+    //         if (startNode != null && goalNode != null)
+    //         {
+    //             List<TileNode> path = FindPath(startNode, goalNode);
 
-                if (path != null)
-                {
-                    printPath(path);
-                    StartCoroutine(MoveByPath(path));
-                    foundPath = true;
+    //             if (path != null)
+    //             {
+    //                 printPath(path);
+    //                 StartCoroutine(MoveByPath(path));
+    //                 foundPath = true;
 
-                }
-                else
-                {
-                    Debug.Log("No se encontró un camino.");
-                }
-            }
+    //             }
+    //             else
+    //             {
+    //                 Debug.Log("No se encontró un camino.");
+    //             }
+    //         }
 
-        }
+    //     }
 
-    }
+    // }
 
-    public static List<TileNode> FindPath(TileNode startNode, TileNode goalNode)
+    public List<TileNode> FindPath(TileNode startNode, TileNode goalNode)
     {
         // Crear las listas abiertas y cerradas
         List<NodeRecord> openList = new List<NodeRecord>();
@@ -159,49 +143,6 @@ public class AStar : MonoBehaviour
         return lowest;
     }
 
-    void printPath(List<TileNode> path)
-    {
-        string result = "Camino encontrado: \n";
 
-        foreach (TileNode node in path)
-        {
-            result += node.position.ToString() + ",";
-        }
-
-        result += "\n";
-
-        Debug.Log(result);
-    }
-
-    IEnumerator MoveByPath(List<TileNode> path)
-    {
-
-   
-
-        foreach (TileNode node in path)
-        {
-            // Obtener la posición del centro del TileNode en el mundo
-            Vector3 posToMove = tilemap.GetCellCenterWorld((Vector3Int)node.position);
-            positionObject.transform.position = posToMove;
-            LWYG.target = positionObject.transform;
-            // Asignar el nuevo objetivo al movementArrive
-            movement.target = positionObject.transform;
-            movement.arrive = false;
-
-            // Esperar hasta que el personaje llegue al nodo
-            yield return StartCoroutine(WaitUntilArrived());
-        }
-
-    }
-
-    IEnumerator WaitUntilArrived()
-    {
-        // Esperar hasta que la distancia al objetivo sea lo suficientemente pequeña
-        while (!movement.arrive)
-        {
-            yield return null;  // Espera un frame y vuelve a comprobar
-        }
-
-    }
 
 }

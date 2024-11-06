@@ -36,7 +36,7 @@ public class TileGraphVisualizer : MonoBehaviour
                 {
                     TileNode node = new TileNode(gridPos);
                     nodes.Add(gridPos, node);
-                    // CreateTextAtNode(node);
+                    CreateTextAtNode(node);
                 }
 
 
