@@ -104,9 +104,6 @@ public class MovementController : MonoBehaviour
 
     IEnumerator MoveByPath(List<TileNode> path)
     {
-        aStar.foundPath = true;
-
-
         foreach (TileNode node in path)
         {
             // Obtener la posición del centro del TileNode en el mundo

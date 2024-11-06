@@ -120,6 +120,8 @@ public class AStar : MonoBehaviour
             current = closedList.Find(record => record.node == current.connection.from);
         }
         path.Reverse();
+
+        foundPath = true;
         return path;
     }
 

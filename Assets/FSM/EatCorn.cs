@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
+
 using UnityEngine;
 
 public class EatCorn : MonoBehaviour
@@ -14,6 +11,7 @@ public class EatCorn : MonoBehaviour
 
     private RefillFarm refillFarmer;
 
+    private ScareBirdSleep sleepScareBird;
 
     private GameObject food;
 
@@ -23,14 +21,19 @@ public class EatCorn : MonoBehaviour
         movement = GetComponent<MovementController>();
         stateMachine = GetComponent<BirdFSM>();
         refillFarmer = GameObject.FindGameObjectWithTag("Farmer").GetComponent<RefillFarm>();
-
-
-
+        sleepScareBird = GameObject.FindGameObjectWithTag("ScareBird").GetComponent<ScareBirdSleep>();
 
     }
 
     void Update()
     {
+        if (!sleepScareBird.sleeping) {
+
+            stateMachine.ChangeState(stateMachine.hide);
+            return;
+        }
+
+
         food = GameObject.FindGameObjectWithTag("Rice");
 
         if (food == null || !refillFarmer.refill)

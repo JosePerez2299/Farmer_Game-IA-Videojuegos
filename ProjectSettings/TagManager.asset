@@ -11,6 +11,10 @@ TagManager:
   - Farmer
   - Depot
   - BirdHouse
+  - NoRice
+  - ScareBirdSpot
+  - HideSpot
+  - ScareBird
   layers:
   - Default
   - TransparentFX

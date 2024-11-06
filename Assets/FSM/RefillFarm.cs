@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
+
 using UnityEngine;
 
 public class RefillFarm : MonoBehaviour
@@ -10,15 +7,13 @@ public class RefillFarm : MonoBehaviour
     FarmerFSM stateMachine;
     private MovementController movement;
     private Transform character;
-    private Vector3[] resourceLocation;
 
-
+    private ScareBirdSleep sleepScareBird;
 
     private GameObject[] food;
 
     private GameObject bed;
     public float targetTime;
-
 
     void Start()
     {
@@ -26,24 +21,30 @@ public class RefillFarm : MonoBehaviour
         movement = GetComponent<MovementController>();
         stateMachine = GetComponent<FarmerFSM>();
         bed = GameObject.FindGameObjectWithTag("Depot");
-
-
+        sleepScareBird = GameObject
+            .FindGameObjectWithTag("ScareBird")
+            .GetComponent<ScareBirdSleep>();
     }
 
     void Update()
     {
+        // if (!sleepScareBird.sleeping)
+        // {
+        //     stateMachine.ChangeState(stateMachine.hide);
+        //     return;
+        // }
+
         food = GameObject.FindGameObjectsWithTag("NoRice");
-        if (food != null && food.Length >= 1)
+        if (food != null && food.Length >= 4)
         {
             {
                 refill = false;
                 stateMachine.ChangeState(stateMachine.PlantCorn);
-
             }
             return;
         }
-        else MoveToSleep(bed.transform);
-
+        else
+            MoveToSleep(bed.transform);
     }
 
     private void MoveToSleep(Transform bedTransform)
@@ -58,4 +59,3 @@ public class RefillFarm : MonoBehaviour
         movement.moveTo(bedTransform);
     }
 }
-

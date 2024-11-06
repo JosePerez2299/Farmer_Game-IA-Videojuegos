@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
+
 using UnityEngine;
 
 public class PlantCorn : MonoBehaviour
@@ -13,28 +10,27 @@ public class PlantCorn : MonoBehaviour
     private GameObject farmer;
     private Sleep sleep;
 
-
-
+    private ScareBirdSleep sleepScareBird;
 
     private GameObject food;
-
 
     void Start()
     {
         movement = GetComponent<MovementController>();
         stateMachine = GetComponent<FarmerFSM>();
         sleep = GetComponent<Sleep>();
-        
-
-
-
-
-
+        sleepScareBird = GameObject
+            .FindGameObjectWithTag("ScareBird")
+            .GetComponent<ScareBirdSleep>();
     }
 
     void Update()
     {
-
+        // if (!sleepScareBird.sleeping)
+        // {
+        //     stateMachine.ChangeState(stateMachine.hide);
+        //     return;
+        // }
         food = GameObject.FindGameObjectWithTag("NoRice");
 
         if (food == null)
@@ -43,18 +39,11 @@ public class PlantCorn : MonoBehaviour
             return;
         }
 
-
-
         MoveToEat(food.transform);
-
-
-
-
     }
 
     private void MoveToEat(Transform food)
     {
-
         Vector3 distance = food.position - transform.position;
 
         if (distance.magnitude < 1f)
@@ -63,7 +52,5 @@ public class PlantCorn : MonoBehaviour
         }
 
         movement.moveTo(food);
-
-
     }
 }

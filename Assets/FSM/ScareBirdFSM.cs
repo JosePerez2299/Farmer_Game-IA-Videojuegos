@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class BirdFSM : StateMachine
+public class ScareBirdFSM : MonoBehaviour
 {
     [HideInInspector]
-    public Sleep Sleep;
-    public EatCorn EatCorn ;
+    public ScareBirdSleep sleep;
+    public ScareBirdWalking walking;
 
     public MonoBehaviour initialState;
     public MonoBehaviour currentState;
@@ -16,21 +16,19 @@ public class BirdFSM : StateMachine
     void Start()
     {
 
-        EatCorn = GetComponent<EatCorn>();
-        Sleep = GetComponent<Sleep>();
-        hide = GetComponent<HideBird>();
-
+        sleep = GetComponent<ScareBirdSleep>();
+        walking = GetComponent<ScareBirdWalking>();
         ChangeState(initialState);
 
     }
 
-    public override void ChangeState(MonoBehaviour newState)
+    public void ChangeState(MonoBehaviour newState)
     {
         if (currentState != null)
         {
             currentState.enabled = false;
         }
-        lastState = currentState;
+
         currentState = newState;
         currentState.enabled = true;
 
