@@ -29,11 +29,11 @@ public class Sleep : MonoBehaviour
 
     void Update()
     {
-        if (!sleepScareBird.sleeping)
-        {
-            stateMachine.ChangeState(stateMachine.hide);
-            return;
-        }
+        // if (!sleepScareBird.sleeping)
+        // {
+        //     stateMachine.ChangeState(stateMachine.hide);
+        //     return;
+        // }
         
 
 

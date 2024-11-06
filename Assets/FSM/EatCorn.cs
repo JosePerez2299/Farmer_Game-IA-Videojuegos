@@ -27,11 +27,11 @@ public class EatCorn : MonoBehaviour
 
     void Update()
     {
-        if (!sleepScareBird.sleeping) {
+        // if (!sleepScareBird.sleeping) {
 
-            stateMachine.ChangeState(stateMachine.hide);
-            return;
-        }
+        //     stateMachine.ChangeState(stateMachine.hide);
+        //     return;
+        // }
 
 
         food = GameObject.FindGameObjectWithTag("Rice");

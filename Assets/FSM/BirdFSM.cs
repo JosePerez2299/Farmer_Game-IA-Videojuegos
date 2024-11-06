@@ -18,7 +18,7 @@ public class BirdFSM : StateMachine
 
         EatCorn = GetComponent<EatCorn>();
         Sleep = GetComponent<Sleep>();
-        hide = GetComponent<HideBird>();
+        hide = GetComponent<Hide>();
 
         ChangeState(initialState);
 
