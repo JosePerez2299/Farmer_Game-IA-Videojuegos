@@ -8,7 +8,7 @@ public class MovementController : MonoBehaviour
 {
     public Transform target; // El objetivo actual
     private Dijkstra dijkstra; // Referencia al script de A*
-    private KinematicArrive kinematicArrive; // Referencia al script de KinematicArrive
+    private DynamicArrive kinematicArrive; // Referencia al script de DynamicArrive
     private TileGraphVisualizer graphVisualizer; // Referencia al grafo
     private Transform character; // El objeto que se moverá
     private Transform lastTarget;
@@ -20,8 +20,8 @@ public class MovementController : MonoBehaviour
 
     void Start()
     {
-        dijkstra = GetComponent<Dijkstra>();
-        kinematicArrive = GetComponent<KinematicArrive>();
+        dijkstra =gameObject.AddComponent<Dijkstra>();
+        kinematicArrive = GetComponent<DynamicArrive>();
         GameObject graph = GameObject.FindGameObjectWithTag("Map");
         graphVisualizer = graph.GetComponent<TileGraphVisualizer>();
         character = transform;
@@ -102,9 +102,10 @@ public class MovementController : MonoBehaviour
         // Verificar si la distancia entre el personaje y el objetivo es menor que el umbral de llegada
         if (
             Vector3.Distance(character.position, kinematicArrive.target.position)
-            < kinematicArrive.radius
+            < kinematicArrive.targetRadius
         )
         {
+            
             return true; // El personaje ha llegado
         }
         return false; // El personaje no ha llegado

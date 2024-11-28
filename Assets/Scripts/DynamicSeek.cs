@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -28,6 +29,7 @@ public class DynamicSeek : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (target == null) return;
         SteeringOutput steering = getSteering();
         kinematic.UpdateKinematic(steering, maxSpeed);
         rb.linearVelocity = kinematic.velocity;

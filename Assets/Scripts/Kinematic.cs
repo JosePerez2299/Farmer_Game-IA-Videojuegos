@@ -22,7 +22,13 @@ public class Kinematic : MonoBehaviour
         orientation = rb.rotation;
 
     }
+    
 
+    void Update(){
+
+
+        
+    }
     public void UpdateKinematic(SteeringOutput steering, float maxSpeed)
     {
         float time = Time.deltaTime;

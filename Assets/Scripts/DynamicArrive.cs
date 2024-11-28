@@ -4,14 +4,17 @@ using UnityEngine;
 
 public class DynamicArrive : MonoBehaviour
 {
-    private Transform character;
+    public Transform character;
     public Transform target;
     private Kinematic kinematic;
     public Rigidbody2D rb;
     private SteeringOutput result;
-    public float maxAcceleration = 20, maxSpeed = 20;
+    public float maxAcceleration = 20,
+        maxSpeed = 20;
 
-    public float targetRadius = 3, slowRadius = 10, timeToTarget = 1;
+    public float targetRadius = 3,
+        slowRadius = 10,
+        timeToTarget = 1;
 
     private NewOrientation orientation;
 
@@ -23,27 +26,27 @@ public class DynamicArrive : MonoBehaviour
         result = gameObject.AddComponent<SteeringOutput>();
         kinematic = gameObject.AddComponent<Kinematic>();
         gameObject.AddComponent<NewOrientation>();
-        orientation = GetComponent<NewOrientation>();
+        // orientation = GetComponent<NewOrientation>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (target == null)
+            return;
         SteeringOutput steering = getSteering();
 
-        if (steering != null)
+        if (steering == null)
         {
-            kinematic.UpdateKinematic(steering, maxSpeed);
-            character.position = kinematic.position;
-            rb.rotation = kinematic.rotation;
-            rb.angularVelocity = kinematic.orientation;
-            rb.linearVelocity = kinematic.velocity;
-            character.eulerAngles = new Vector3(0, 0, orientation.Calculate(character.eulerAngles.z, rb.linearVelocity));
+            // Reducir la velocidad hasta detener el objeto gradualmente
+            rb.linearVelocity = Vector2.zero;
+            kinematic.velocity = Vector2.zero; // Lerp entre velocidad actual y cero
+
+            return;
         }
-        else rb.linearVelocity = Vector2.zero;
 
-
-
+        kinematic.UpdateKinematic(steering, maxSpeed);
+        rb.linearVelocity = kinematic.velocity;
     }
 
     SteeringOutput getSteering()
@@ -51,12 +54,11 @@ public class DynamicArrive : MonoBehaviour
         Vector2 direction = target.position - character.position;
         Vector2 targetVelocity;
 
-        float distance = direction.magnitude;
+        float distance = Vector3.Distance(character.position, target.position);
         float targetSpeed;
 
         if (distance < targetRadius)
         {
-
             return null;
         }
 
@@ -85,5 +87,4 @@ public class DynamicArrive : MonoBehaviour
         result.angular = 0;
         return result;
     }
-
 }
