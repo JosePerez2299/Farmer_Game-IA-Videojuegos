@@ -6,15 +6,12 @@ public class NodeRecord
 {
     public TileNode node;
     public Edge connection;
-    public float costSoFar;          // Costo total hasta este nodo
-    public float estimatedTotalCost; // Costo total estimado
+    public float costSoFar;
 
-    public NodeRecord(TileNode node, Edge connection, float costSoFar, float estimatedTotalCost)
+    public NodeRecord(TileNode node, Edge connection, float costSoFar)
     {
         this.node = node;
         this.connection = connection;
         this.costSoFar = costSoFar;
-        this.estimatedTotalCost = estimatedTotalCost;
     }
 }
-

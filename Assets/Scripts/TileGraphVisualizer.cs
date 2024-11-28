@@ -37,8 +37,6 @@ public class TileGraphVisualizer : MonoBehaviour
                     TileNode node = new TileNode(gridPos);
                     nodes.Add(gridPos, node);
                 }
-
-
             }
         }
 
@@ -48,8 +46,12 @@ public class TileGraphVisualizer : MonoBehaviour
 
     void ConnectNeighbors()
     {
-        Vector2Int[] directions = {
-            Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right
+        Vector2Int[] directions =
+        {
+            Vector2Int.up,
+            Vector2Int.down,
+            Vector2Int.left,
+            Vector2Int.right,
         };
         foreach (KeyValuePair<Vector2Int, TileNode> kvp in nodes)
         {
@@ -61,11 +63,8 @@ public class TileGraphVisualizer : MonoBehaviour
                 {
                     nodes[kvp.Key].AddNeighbor(nodes[neighborPos]);
                 }
-
             }
-
         }
-
     }
 
     // Devuelve el nodo asociado a una posición del Tilemap
@@ -92,34 +91,18 @@ public class TileGraphVisualizer : MonoBehaviour
 
         // Ajustar el tamaño y la apariencia del texto
         textMesh.characterSize = 0.2f;
-        textMesh.color = Color.white;  // Puedes cambiar el color del texto aquí
+        textMesh.color = Color.white; // Puedes cambiar el color del texto aquí
     }
 
     void OnDrawGizmos()
     {
-        if (nodes == null || nodes.Count == 0 || !draw) return;
+        if (nodes == null || nodes.Count == 0 || !draw)
+            return;
 
         foreach (var node in nodes.Values)
         {
-            // Obtener la posición del centro del tile
-            Vector3 worldPos = tilemap.GetCellCenterWorld(new Vector3Int(node.position.x, node.position.y, 0));
-
-            // Dibujar una esfera en el centro del nodo
-            Gizmos.color = nodeColor;
-            Gizmos.DrawSphere(worldPos, 0.15f);
-            // Configurar el texto inicial
-
-            // Dibujar las conexiones a los vecinos
-            Gizmos.color = connectionColor;
-            foreach (var neighbor in node.neighbors)
-            {
-                Vector3 neighborWorldPos = tilemap.GetCellCenterWorld(new Vector3Int(neighbor.to.position.x, neighbor.to.position.y, 0));
-                Gizmos.DrawLine(worldPos, neighborWorldPos);  // Dibuja una línea entre el nodo y su vecino
-            }
+            node.DrawGizmo();
+            
         }
     }
-
-
-
-
 }
