@@ -97,14 +97,14 @@ public class BirdMachine : MonoBehaviour
     {
         Vector3 distance = target.position - transform.position;
 
-        if (distance.magnitude < 1f)
+        if (distance.magnitude < 2f)
         {
             sleeping = true;
             return;
         }
 
 
-        
+
         movement.moveTo(target);
     }
 }

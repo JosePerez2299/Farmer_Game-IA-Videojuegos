@@ -6,28 +6,35 @@ using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
+    public float maxAcceleration = 5,
+        maxSpeed = 5,
+        targetRadius = 0.5f;
     public Transform target; // El objetivo actual
     public AStar aStar; // Referencia al script de A*
     private KinematicArrive kinematicArrive; // Referencia al script de DynamicArrive
     private TileGraphVisualizer graphVisualizer; // Referencia al grafo
     private Transform character; // El objeto que se moverá
+
+    public Rigidbody2D rb;
+
     private Transform lastTarget;
 
     private Vector2Int lastTargetPos;
-    private List<TileNode> path; // Ruta calculada
+    public List<TileNode> path; // Ruta calculada
     private int currentNodeIndex = 0; // Índice del nodo actual
     private Vector2Int lastTargetPosition; // Posición previa del objetivo para detección de cambios
 
     void Start()
     {
-        aStar =gameObject.AddComponent<AStar>();
+        aStar = gameObject.AddComponent<AStar>();
         kinematicArrive = GetComponent<KinematicArrive>();
         GameObject graph = GameObject.FindGameObjectWithTag("Map");
         graphVisualizer = graph.GetComponent<TileGraphVisualizer>();
         character = transform;
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (target == null)
             return;
@@ -39,39 +46,69 @@ public class MovementController : MonoBehaviour
         {
             // Moverse al nodo actual
             TileNode currentNode = path[currentNodeIndex];
+            DrawRemainingPath();
+
             moveToPoint(currentNode);
 
             if (arrive())
+            {
                 currentNodeIndex++;
+            }
+
+            return;
         }
+
+        rb.linearVelocity = Vector2.zero;
     }
 
     public void moveTo(Transform newTarget)
     {
-        target = newTarget;
+        Vector2Int posInCell = (Vector2Int)graphVisualizer.tilemap.WorldToCell(newTarget.position);
+        TileNode node = graphVisualizer.GetNodeAtPosition(posInCell);
+
+        target = node.gameObject.transform;
     }
 
     private void moveToPoint(TileNode node)
     {
-        
-        kinematicArrive.target = node.gameObject.transform;
+        Vector3 targetPosition = node.gameObject.transform.position;
+
+        // Dirección hacia el objetivo
+        Vector3 direction = (targetPosition - character.position).normalized;
+
+        // Calcula la aceleración deseada
+        Vector3 desiredAcceleration = direction * maxAcceleration;
+
+        // Limita la aceleración para no exceder el máximo permitido
+        if (desiredAcceleration.magnitude > maxAcceleration)
+        {
+            desiredAcceleration = desiredAcceleration.normalized * maxAcceleration;
+        }
+
+        // Aplica la aceleración al Rigidbody2D
+        if (rb != null)
+        {
+            rb.linearVelocity += (Vector2)(desiredAcceleration * Time.deltaTime);
+
+            // Limita la velocidad máxima
+            if (rb.linearVelocity.magnitude > maxSpeed)
+            {
+                rb.linearVelocity = rb.linearVelocity.normalized * maxSpeed;
+            }
+        }
     }
 
     private void CalculatePath()
     {
-
         // Convertir las posiciones a celdas del Tilemap
         Vector2Int start = (Vector2Int)graphVisualizer.tilemap.WorldToCell(character.position);
         Vector2Int end = (Vector2Int)graphVisualizer.tilemap.WorldToCell(target.position);
 
-        Debug.Log(end == lastTargetPos);
-        // Verificar si el objetivo es válido
-        if ( end == lastTargetPos)
+        if (end == lastTargetPos)
         {
             Debug.Log("No se puede calcular la ruta porque el objetivo es igual al anterior.");
             return;
         }
-
 
         // // Obtener los nodos de inicio y objetivo
         TileNode startNode = graphVisualizer.GetNodeAtPosition(start);
@@ -97,18 +134,39 @@ public class MovementController : MonoBehaviour
         }
     }
 
+    private void DrawRemainingPath()
+    {
+        // Verifica que haya un camino válido
+        if (path == null || currentNodeIndex >= path.Count - 1)
+            return;
+
+        for (int i = currentNodeIndex; i < path.Count - 1; i++)
+        {
+            TileNode currentNode = path[i];
+            TileNode nextNode = path[i + 1];
+
+            // Dibujar línea entre los nodos
+            Debug.DrawLine(
+                currentNode.gameObject.transform.position,
+                nextNode.gameObject.transform.position,
+                Color.cyan,
+                0f // Se dibuja en cada frame
+            );
+        }
+    }
+
     private bool arrive()
     {
-        // Verificar si la distancia entre el personaje y el objetivo es menor que el umbral de llegada
         if (
-            Vector3.Distance(character.position, kinematicArrive.target.position)
-            < kinematicArrive.targetRadius
+            Vector3.Distance(
+                character.position,
+                path[currentNodeIndex].gameObject.transform.position
+            ) < targetRadius
         )
         {
-            
-            return true; // El personaje ha llegado
+            return true; // El personaje ha llegado al nodo actual
         }
-        return false; // El personaje no ha llegado
+        return false;
     }
 
     private void printPath(List<TileNode> path)
