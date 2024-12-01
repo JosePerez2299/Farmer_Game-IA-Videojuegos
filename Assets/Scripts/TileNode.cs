@@ -7,7 +7,7 @@ public class TileNode
     public Vector2Int position; // Posición del nodo en la grilla
     public List<Edge> neighbors; // Vecinos del nodo
     public GameObject gameObject; // Representación visual
-    
+
     public int baseCost = 1; // Costo base para moverse por el nodo
     public Dictionary<AgentType, int> tacticalCosts = new Dictionary<AgentType, int>(); // Costos tácticos por agente
 
@@ -31,6 +31,7 @@ public class TileNode
         int tacticalCost = tacticalCosts.ContainsKey(agentType) ? tacticalCosts[agentType] : 0;
         return baseCost + tacticalCost;
     }
+
     public void AddNeighbor(TileNode neighbor)
     {
         neighbors.Add(new Edge(this, neighbor));
@@ -39,7 +40,7 @@ public class TileNode
     private GameObject CreateGameObject()
     {
         // Crear un nuevo GameObject
-        GameObject nodeObject = new($"TileNode_{position.x }_{position.y}");
+        GameObject nodeObject = new($"TileNode_{position.x}_{position.y}");
 
         // Asignar posición en el mundo
         nodeObject.transform.position = new Vector3(position.x + 0.5f, position.y + 0.5f, 0);
@@ -60,39 +61,8 @@ public class TileNode
 
     public void DrawGizmo()
     {
-        // Posición del nodo en el mundo
-        Vector3 worldPosition = new(gameObject.transform.position.x, gameObject.transform.position.y, 0);
 
-        // Dibujar un punto en la posición del nodo
-        Gizmos.color = Color.green;
-        Gizmos.DrawSphere(worldPosition, 0.1f);
-
-        // Dibujar líneas hacia los vecinos
-        Gizmos.color = Color.yellow;
-        foreach (Edge edge in neighbors)
-        {
-            Vector3 neighborPosition = new Vector3(edge.to.gameObject.transform.position.x, edge.to.gameObject.transform.position.y, 0);
-            Gizmos.DrawLine(worldPosition, neighborPosition);
-        }
-
-
-         // Mostrar los costos tácticos por cada agente
-        foreach (var tacticalCost in tacticalCosts)
-        {
-            // Crear texto con AgentType y costo
-            string label = $"{tacticalCost.Key}\n{tacticalCost.Value}";
-
-            // Mostrar el texto encima del nodo
-            Handles.Label(
-                worldPosition + Vector3.up , // Ajusta la altura del texto
-                label,
-                new GUIStyle
-                {
-                    fontSize = 12,
-                    normal = new GUIStyleState { textColor = Color.white }
-                }
-            );
-        }
+  
     }
 }
 

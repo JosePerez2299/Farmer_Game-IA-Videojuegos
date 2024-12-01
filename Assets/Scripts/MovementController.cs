@@ -20,10 +20,10 @@ public class MovementController : MonoBehaviour
     private Transform lastTarget;
 
     private Vector2Int lastTargetPos;
-    public List<TileNode> path; // Ruta calculada
+    public List<TileNode> path, oldPath; // Ruta calculada
     private int currentNodeIndex = 0; // Índice del nodo actual
-    private Vector2Int lastTargetPosition; // Posición previa del objetivo para detección de cambios
     private AgentTypeUtility agentTypeUtility = new();
+
     void Start()
     {
         aStar = gameObject.AddComponent<AStar>();
@@ -39,8 +39,10 @@ public class MovementController : MonoBehaviour
         if (target == null)
             return;
         else
+            CalculateOldPath();
 
             CalculatePath(agentTypeUtility.GetAgentTypeFromString(gameObject.name));
+
 
         // Verificar si hay una ruta válida
         if (path != null && currentNodeIndex < path.Count)
@@ -48,7 +50,7 @@ public class MovementController : MonoBehaviour
             // Moverse al nodo actual
             TileNode currentNode = path[currentNodeIndex];
             DrawRemainingPath(path, currentNodeIndex, Color.cyan);
-
+            DrawRemainingPath(oldPath, 0, Color.red);
             moveToPoint(currentNode);
 
             if (arrive())
@@ -99,6 +101,29 @@ public class MovementController : MonoBehaviour
         }
     }
 
+    private void CalculateOldPath()
+    {
+        // Convertir las posiciones a celdas del Tilemap
+        Vector2Int start = (Vector2Int)graphVisualizer.tilemap.WorldToCell(character.position);
+        Vector2Int end = (Vector2Int)graphVisualizer.tilemap.WorldToCell(target.position);
+
+        if (end == lastTargetPos)
+        {
+            // Debug.Log("No se puede calcular la ruta porque el objetivo es igual al anterior.");
+            return;
+        }
+
+        // // Obtener los nodos de inicio y objetivo
+        TileNode startNode = graphVisualizer.GetNodeAtPosition(start);
+        TileNode goalNode = graphVisualizer.GetNodeAtPosition(end);
+
+        if (startNode != null && goalNode != null)
+        {
+            // Calcular la ruta usando A*
+            oldPath = aStar.FindPath(startNode, goalNode, AgentType.None);
+        }
+    }
+
     private void CalculatePath(AgentType agentType = AgentType.None)
     {
         // Convertir las posiciones a celdas del Tilemap
@@ -118,25 +143,15 @@ public class MovementController : MonoBehaviour
         lastTargetPos = end;
 
         if (startNode != null && goalNode != null)
-        {   
-
-            
-
+        {
             // Calcular la ruta usando A*
             path = aStar.FindPath(startNode, goalNode, agentType);
-            if (gameObject.name == "Bird") {
-
-            Debug.Log("Calculando Path para: "+ agentType + "--Hasta:" + target.name);
-            printPath(path);
-            }
-          
 
             currentNodeIndex = 0; // Reiniciar el índice de nodo actual
             if (path == null)
             {
                 // Debug.Log("No se encontró un camino.");
             }
-          
         }
         else
         {
@@ -181,7 +196,8 @@ public class MovementController : MonoBehaviour
 
     private void printPath(List<TileNode> path)
     {
-        if (path==null) return;
+        if (path == null)
+            return;
         string result = "Camino:\n";
         foreach (TileNode node in path)
         {

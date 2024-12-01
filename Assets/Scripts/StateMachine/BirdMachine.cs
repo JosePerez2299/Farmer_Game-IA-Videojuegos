@@ -107,18 +107,18 @@ public class BirdMachine : MonoBehaviour
             return;
         }
 
-        if (Random.value < 0.02f) // 30% de probabilidad
-            {
-                TileNode currentNode = graphVisualizer.GetNodeAtPosition(
-                    (Vector2Int)graphVisualizer.tilemap.WorldToCell(transform.position)
-                );
-                graphVisualizer.GenerateTacticalPoint(
-                    currentNode,
-                    AgentType.Bird,
-                    10
+        // if (Random.value < 0.02f) // 30% de probabilidad
+        //     {
+        //         TileNode currentNode = graphVisualizer.GetNodeAtPosition(
+        //             (Vector2Int)graphVisualizer.tilemap.WorldToCell(transform.position)
+        //         );
+        //         graphVisualizer.GenerateTacticalPoint(
+        //             currentNode,
+        //             AgentType.Bird,
+        //             10
                     
-                ); // Ventajoso para el granjero
-            }
+        //         ); // Ventajoso para el granjero
+        //     }
 
         movement.moveTo(target);
     }
