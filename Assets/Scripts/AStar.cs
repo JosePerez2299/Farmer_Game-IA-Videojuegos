@@ -72,7 +72,7 @@ public class AStar : MonoBehaviour
     private static int Heuristic(TileNode a, TileNode b, AgentType agentType)
     {
         int heuristic =
-            Mathf.Abs(a.position.x - b.position.x) + Mathf.Abs(a.position.y - b.position.y) + b.GetTotalCost(agentType);
+            Mathf.Abs(a.position.x - b.position.x) + Mathf.Abs(a.position.y - b.position.y) ;
 
         // Calcula la distancia Manhattan + el costo táctico basado en el agente
         return heuristic;
