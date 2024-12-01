@@ -642,9 +642,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a618adaf4f278e544ba77b98138d5fc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 50
-  maxSpeed: 4
-  target: {fileID: 1228309830}
+  maxAcceleration: 20
+  maxSpeed: 3
+  targetRadius: 0.4
+  target: {fileID: 0}
   aStar: {fileID: 0}
   rb: {fileID: 0}
 --- !u!58 &760441414
@@ -3456,8 +3457,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a618adaf4f278e544ba77b98138d5fc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 50
-  maxSpeed: 4
+  maxAcceleration: 20
+  maxSpeed: 3
+  targetRadius: 0.4
   target: {fileID: 0}
   aStar: {fileID: 0}
   rb: {fileID: 0}
