@@ -1,150 +1,95 @@
-// using System.Collections;
-// using System.Collections.Generic;
-// using UnityEngine;
-// using UnityEngine.Tilemaps;
+using System.Collections.Generic;
+using UnityEngine;
 
-// public class AStar : MonoBehaviour
-// {
+public class AStar: MonoBehaviour
+{
+    public  List<TileNode> FindPath(TileNode start, TileNode end)
+    {
+        // Conjuntos abiertos y cerrados
+        var openSet = new HashSet<TileNode> { start };
+        var closedSet = new HashSet<TileNode>();
 
-//     public Tilemap tilemap;
-//     public bool foundPath = false;
+        // Diccionarios para costos y rastreo de padres
+        var gScore = new Dictionary<TileNode, int>();
+        var fScore = new Dictionary<TileNode, int>();
+        var cameFrom = new Dictionary<TileNode, TileNode>();
 
-//     void Start()
-//     {
- 
+        gScore[start] = 0;
+        fScore[start] = Heuristic(start, end);
 
+        while (openSet.Count > 0)
+        {
+            // Encuentra el nodo con menor fScore
+            TileNode current = GetLowestFScoreNode(openSet, fScore);
 
-//     }
+            // Si alcanzamos el objetivo, reconstruimos el camino
+            if (current == end)
+                return ReconstructPath(cameFrom, current);
 
-//     // void Update()
-//     // {
-//     //     // Verifica que el grafo haya sido generado
-//     //     if (graphVisualizer != null && graphVisualizer.nodes != null && !foundPath)
-//     //     {
-//     //         // Obtener la referencia de TileGraphVisualizer
+            openSet.Remove(current);
+            closedSet.Add(current);
 
-//     //         Vector2Int start = (Vector2Int)tilemap.WorldToCell(character.position);
-//     //         Vector2Int end = (Vector2Int)tilemap.WorldToCell(target.position);
+            foreach (Edge edge in current.neighbors)
+            {
+                TileNode neighbor = edge.to;
 
-//     //         TileNode startNode = graphVisualizer.GetNodeAtPosition(start);
-//     //         TileNode goalNode = graphVisualizer.GetNodeAtPosition(end);
+                if (closedSet.Contains(neighbor))
+                    continue;
 
-//     //         if (startNode != null && goalNode != null)
-//     //         {
-//     //             List<TileNode> path = FindPath(startNode, goalNode);
+                int tentativeGScore = gScore[current] + edge.cost;
 
-//     //             if (path != null)
-//     //             {
-//     //                 printPath(path);
-//     //                 StartCoroutine(MoveByPath(path));
-//     //                 foundPath = true;
+                if (!openSet.Contains(neighbor))
+                {
+                    openSet.Add(neighbor);
+                }
+                else if (tentativeGScore >= gScore.GetValueOrDefault(neighbor, int.MaxValue))
+                {
+                    continue;
+                }
 
-//     //             }
-//     //             else
-//     //             {
-//     //                 Debug.Log("No se encontró un camino.");
-//     //             }
-//     //         }
+                // Este es el mejor camino hasta ahora
+                cameFrom[neighbor] = current;
+                gScore[neighbor] = tentativeGScore;
+                fScore[neighbor] = gScore[neighbor] + Heuristic(neighbor, end);
+            }
+        }
 
-//     //     }
+        // No se encontró un camino
+        return null;
+    }
 
-//     // }
+    private static TileNode GetLowestFScoreNode(HashSet<TileNode> openSet, Dictionary<TileNode, int> fScore)
+    {
+        TileNode lowestNode = null;
+        int lowestScore = int.MaxValue;
 
-//     public List<TileNode> FindPath(TileNode startNode, TileNode goalNode)
-//     {
-//         // Crear las listas abiertas y cerradas
-//         List<NodeRecord> openList = new List<NodeRecord>();
-//         List<NodeRecord> closedList = new List<NodeRecord>();
+        foreach (TileNode node in openSet)
+        {
+            int score = fScore.GetValueOrDefault(node, int.MaxValue);
+            if (score < lowestScore)
+            {
+                lowestScore = score;
+                lowestNode = node;
+            }
+        }
 
-//         // Crear el NodeRecord para el nodo inicial
-//         NodeRecord startRecord = new NodeRecord(startNode, null, 0, Heuristic(startNode, goalNode));
-//         openList.Add(startRecord);
+        return lowestNode;
+    }
 
-//         NodeRecord current = null;
+    private static int Heuristic(TileNode a, TileNode b)
+    {
+        // Distancia Manhattan como heurística
+        return Mathf.Abs(a.position.x - b.position.x) + Mathf.Abs(a.position.y - b.position.y);
+    }
 
-//         // Iterar mientras haya nodos por explorar
-//         while (openList.Count > 0)
-//         {
-//             // Obtener el nodo con menor estimatedTotalCost
-//             current = GetLowestCostNode(openList);
-
-//             // Si hemos llegado al nodo objetivo, terminamos
-//             if (current.node == goalNode)
-//                 break;
-
-//             // Obtener las conexiones (vecinos)
-//             foreach (Edge connection in current.node.neighbors)
-//             {
-//                 TileNode endNode = connection.to;
-//                 float endNodeCost = current.costSoFar + connection.cost;
-
-//                 // Buscar en la lista cerrada
-//                 NodeRecord endNodeRecord = closedList.Find(record => record.node == endNode);
-
-//                 // Si el nodo está en la lista cerrada y el costo es peor, continuar
-//                 if (endNodeRecord != null && endNodeRecord.costSoFar <= endNodeCost)
-//                     continue;
-
-//                 // Si no está en la lista abierta o cerrada, crear un nuevo record
-//                 if (endNodeRecord == null)
-//                 {
-//                     endNodeRecord = new NodeRecord(endNode, connection, endNodeCost, endNodeCost + Heuristic(endNode, goalNode));
-//                     openList.Add(endNodeRecord);
-//                 }
-//                 else
-//                 {
-//                     // Si ya está en la lista, actualizar el costo si es mejor
-//                     endNodeRecord.connection = connection;
-//                     endNodeRecord.costSoFar = endNodeCost;
-//                     endNodeRecord.estimatedTotalCost = endNodeCost + Heuristic(endNode, goalNode);
-//                 }
-//             }
-
-//             // Mover el nodo actual a la lista cerrada
-//             openList.Remove(current);
-//             closedList.Add(current);
-//         }
-
-//         // Si no encontramos el objetivo
-//         if (current.node != goalNode)
-//         {
-//             Debug.Log("No se encontró un camino.");
-//             return null;
-//         }
-
-//         // Reconstruir el camino
-//         List<TileNode> path = new List<TileNode>();
-//         while (current.node != startNode)
-//         {
-//             path.Add(current.node);
-//             current = closedList.Find(record => record.node == current.connection.from);
-//         }
-//         path.Reverse();
-
-//         foundPath = true;
-//         return path;
-//     }
-
-//     // Heurística: Usamos la distancia Manhattan para grids
-//     private static float Heuristic(TileNode fromNode, TileNode toNode)
-//     {
-//         return Mathf.Abs(fromNode.position.x - toNode.position.x) + Mathf.Abs(fromNode.position.y - toNode.position.y);
-//     }
-
-//     // Obtener el nodo con menor costo estimado de la lista abierta
-//     private static NodeRecord GetLowestCostNode(List<NodeRecord> list)
-//     {
-//         NodeRecord lowest = list[0];
-//         foreach (NodeRecord record in list)
-//         {
-//             if (record.estimatedTotalCost < lowest.estimatedTotalCost)
-//             {
-//                 lowest = record;
-//             }
-//         }
-//         return lowest;
-//     }
-
-
-
-// }
+    private static List<TileNode> ReconstructPath(Dictionary<TileNode, TileNode> cameFrom, TileNode current)
+    {
+        var path = new List<TileNode>();
+        while (current != null)
+        {
+            path.Insert(0, current);
+            cameFrom.TryGetValue(current, out current);
+        }
+        return path;
+    }
+}

@@ -103,6 +103,8 @@ public class BirdMachine : MonoBehaviour
             return;
         }
 
+
+        
         movement.moveTo(target);
     }
 }

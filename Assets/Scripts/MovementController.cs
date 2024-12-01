@@ -7,8 +7,8 @@ using UnityEngine;
 public class MovementController : MonoBehaviour
 {
     public Transform target; // El objetivo actual
-    private Dijkstra dijkstra; // Referencia al script de A*
-    private DynamicArrive kinematicArrive; // Referencia al script de DynamicArrive
+    public AStar aStar; // Referencia al script de A*
+    private KinematicArrive kinematicArrive; // Referencia al script de DynamicArrive
     private TileGraphVisualizer graphVisualizer; // Referencia al grafo
     private Transform character; // El objeto que se moverá
     private Transform lastTarget;
@@ -20,8 +20,8 @@ public class MovementController : MonoBehaviour
 
     void Start()
     {
-        dijkstra =gameObject.AddComponent<Dijkstra>();
-        kinematicArrive = GetComponent<DynamicArrive>();
+        aStar =gameObject.AddComponent<AStar>();
+        kinematicArrive = GetComponent<KinematicArrive>();
         GameObject graph = GameObject.FindGameObjectWithTag("Map");
         graphVisualizer = graph.GetComponent<TileGraphVisualizer>();
         character = transform;
@@ -82,7 +82,7 @@ public class MovementController : MonoBehaviour
         if (startNode != null && goalNode != null)
         {
             // Calcular la ruta usando A*
-            path = dijkstra.FindPath(startNode, goalNode);
+            path = aStar.FindPath(startNode, goalNode);
             currentNodeIndex = 0; // Reiniciar el índice de nodo actual
             if (path == null)
             {

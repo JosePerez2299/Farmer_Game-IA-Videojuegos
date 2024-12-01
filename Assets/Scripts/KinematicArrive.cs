@@ -7,10 +7,12 @@ public class KinematicArrive : MonoBehaviour
 {
     private Transform character;
     public Transform target;
+
+    public KinematicSteeringOutput steeringOutput;
     private Rigidbody2D rb;
     public float maxSpeed = 1;
 
-    public float radius, timeToTarget;
+    public float targetRadius = 0.5f, timeToTarget = 0.1f;
 
     public bool arrive = false;
 
@@ -20,7 +22,7 @@ public class KinematicArrive : MonoBehaviour
     {
         character = transform;
         rb = GetComponent<Rigidbody2D>();
-        gameObject.AddComponent<KinematicSteeringOutput>();
+        steeringOutput = gameObject.AddComponent<KinematicSteeringOutput>();
     }
 
     // Update is called once per frame
@@ -28,32 +30,29 @@ public class KinematicArrive : MonoBehaviour
     {
         if (target == null) return;
 
-        Vector2 velocity = getSteering().velocity;
-        rb.linearVelocity = velocity;
+        rb.linearVelocity = getSteering();
+
     }
 
 
-    KinematicSteeringOutput getSteering()
+    Vector2 getSteering()
     {
-        KinematicSteeringOutput result = GetComponent<KinematicSteeringOutput>();
-        result.velocity = target.position - character.position;
-
-        if (result.velocity.magnitude < radius)
+        Vector2 velocityResult = target.position - character.position;
+        if (velocityResult.magnitude < targetRadius)
         {
-            result.velocity = new Vector2(0, 0);
+            velocityResult = new Vector2(0, 0);
             arrive = true;
-            return result;
+            return  velocityResult;
         }
 
-        result.velocity /= timeToTarget;
+        velocityResult /= timeToTarget;
 
-        if (result.velocity.magnitude > maxSpeed)
+        if (velocityResult.magnitude > maxSpeed)
         {
-            result.velocity.Normalize();
-            result.velocity *= maxSpeed;
+            velocityResult.Normalize();
+            velocityResult *= maxSpeed;
         }
-        result.rotation = 0;
 
-        return result;
+        return  velocityResult;
     }
 }
