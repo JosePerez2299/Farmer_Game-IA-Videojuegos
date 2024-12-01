@@ -1181,7 +1181,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.875, y: 0.875}
+    oldSize: {x: 1, y: 1}
     newSize: {x: 0.93333334, y: 0.93333334}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -3636,7 +3636,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 90e5500779294cd4a9fd99930670929b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f041cee8e188f7142a3e0efee22a001e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -3685,7 +3685,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.64, y: 0.64}
+    oldSize: {x: 1, y: 1}
     newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -4020,7 +4020,7 @@ MonoBehaviour:
   footprintPrefab: {fileID: 1677897820}
   trapPrefab: {fileID: 1052756016}
   movementThreshold: 2
-  footprintProbability: 0.3
+  footprintProbability: 0.2
 --- !u!114 &1228309839
 MonoBehaviour:
   m_ObjectHideFlags: 0
