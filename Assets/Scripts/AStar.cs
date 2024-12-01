@@ -1,64 +1,57 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class AStar: MonoBehaviour
+public class AStar : MonoBehaviour
 {
-    public  List<TileNode> FindPath(TileNode start, TileNode end)
+   public List<TileNode> FindPath(TileNode start, TileNode end, AgentType agentType)
+{
+    var openSet = new HashSet<TileNode> { start };
+    var closedSet = new HashSet<TileNode>();
+    var gScore = new Dictionary<TileNode, int> { [start] = 0 };
+    var fScore = new Dictionary<TileNode, int> { [start] = Heuristic(start, end, agentType) };
+    var cameFrom = new Dictionary<TileNode, TileNode>();
+
+    while (openSet.Count > 0)
     {
-        // Conjuntos abiertos y cerrados
-        var openSet = new HashSet<TileNode> { start };
-        var closedSet = new HashSet<TileNode>();
+        TileNode current = GetLowestFScoreNode(openSet, fScore);
 
-        // Diccionarios para costos y rastreo de padres
-        var gScore = new Dictionary<TileNode, int>();
-        var fScore = new Dictionary<TileNode, int>();
-        var cameFrom = new Dictionary<TileNode, TileNode>();
+        if (current == end)
+            return ReconstructPath(cameFrom, current);
 
-        gScore[start] = 0;
-        fScore[start] = Heuristic(start, end);
+        openSet.Remove(current);
+        closedSet.Add(current);
 
-        while (openSet.Count > 0)
+        foreach (Edge edge in current.neighbors)
         {
-            // Encuentra el nodo con menor fScore
-            TileNode current = GetLowestFScoreNode(openSet, fScore);
+            TileNode neighbor = edge.to;
 
-            // Si alcanzamos el objetivo, reconstruimos el camino
-            if (current == end)
-                return ReconstructPath(cameFrom, current);
+            if (closedSet.Contains(neighbor))
+                continue;
 
-            openSet.Remove(current);
-            closedSet.Add(current);
+            int tentativeGScore = gScore[current] + edge.cost + neighbor.GetTotalCost(agentType);
 
-            foreach (Edge edge in current.neighbors)
-            {
-                TileNode neighbor = edge.to;
+            if (!openSet.Contains(neighbor))
+                openSet.Add(neighbor);
+            else if (tentativeGScore >= gScore.GetValueOrDefault(neighbor, int.MaxValue))
+                continue;
 
-                if (closedSet.Contains(neighbor))
-                    continue;
-
-                int tentativeGScore = gScore[current] + edge.cost;
-
-                if (!openSet.Contains(neighbor))
-                {
-                    openSet.Add(neighbor);
-                }
-                else if (tentativeGScore >= gScore.GetValueOrDefault(neighbor, int.MaxValue))
-                {
-                    continue;
-                }
-
-                // Este es el mejor camino hasta ahora
-                cameFrom[neighbor] = current;
-                gScore[neighbor] = tentativeGScore;
-                fScore[neighbor] = gScore[neighbor] + Heuristic(neighbor, end);
-            }
+            cameFrom[neighbor] = current;
+            gScore[neighbor] = tentativeGScore;
+            fScore[neighbor] = gScore[neighbor] + Heuristic(neighbor, end, agentType);
         }
-
-        // No se encontró un camino
-        return null;
     }
 
-    private static TileNode GetLowestFScoreNode(HashSet<TileNode> openSet, Dictionary<TileNode, int> fScore)
+    return null; // No se encontró un camino
+}
+
+
+    private static TileNode GetLowestFScoreNode(
+        HashSet<TileNode> openSet,
+        Dictionary<TileNode, int> fScore
+    )
     {
         TileNode lowestNode = null;
         int lowestScore = int.MaxValue;
@@ -76,13 +69,20 @@ public class AStar: MonoBehaviour
         return lowestNode;
     }
 
-    private static int Heuristic(TileNode a, TileNode b)
+    private static int Heuristic(TileNode a, TileNode b, AgentType agentType)
     {
-        // Distancia Manhattan como heurística
-        return Mathf.Abs(a.position.x - b.position.x) + Mathf.Abs(a.position.y - b.position.y);
+        int heuristic =
+            Mathf.Abs(a.position.x - b.position.x) + Mathf.Abs(a.position.y - b.position.y) + b.GetTotalCost(agentType);
+
+        // Calcula la distancia Manhattan + el costo táctico basado en el agente
+        return heuristic;
+        
     }
 
-    private static List<TileNode> ReconstructPath(Dictionary<TileNode, TileNode> cameFrom, TileNode current)
+    private static List<TileNode> ReconstructPath(
+        Dictionary<TileNode, TileNode> cameFrom,
+        TileNode current
+    )
     {
         var path = new List<TileNode>();
         while (current != null)

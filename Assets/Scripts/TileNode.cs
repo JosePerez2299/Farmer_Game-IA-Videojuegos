@@ -1,11 +1,15 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class TileNode
 {
-    public Vector2Int position; // Posición del tile en la grilla
-    public List<Edge> neighbors; // Lista de vecinos del nodo
-    public GameObject gameObject; // Representación visual del nodo
+    public Vector2Int position; // Posición del nodo en la grilla
+    public List<Edge> neighbors; // Vecinos del nodo
+    public GameObject gameObject; // Representación visual
+    
+    public int baseCost = 1; // Costo base para moverse por el nodo
+    public Dictionary<AgentType, int> tacticalCosts = new Dictionary<AgentType, int>(); // Costos tácticos por agente
 
     public TileNode(Vector2Int pos)
     {
@@ -14,6 +18,19 @@ public class TileNode
         gameObject = CreateGameObject(); // Crear el GameObject al inicializar el nodo
     }
 
+    // Configurar el costo táctico para un agente específico
+    public void SetTacticalCost(AgentType agentType, int cost)
+    {
+        tacticalCosts[agentType] = cost;
+    }
+
+    // Obtener el costo total de este nodo para un agente específico
+    public int GetTotalCost(AgentType agentType)
+    {
+        // Si el agente tiene un costo táctico definido, se usa, sino se usa 0 (sin costo adicional)
+        int tacticalCost = tacticalCosts.ContainsKey(agentType) ? tacticalCosts[agentType] : 0;
+        return baseCost + tacticalCost;
+    }
     public void AddNeighbor(TileNode neighbor)
     {
         neighbors.Add(new Edge(this, neighbor));
@@ -48,7 +65,7 @@ public class TileNode
 
         // Dibujar un punto en la posición del nodo
         Gizmos.color = Color.green;
-        Gizmos.DrawSphere(worldPosition, 0.2f);
+        Gizmos.DrawSphere(worldPosition, 0.1f);
 
         // Dibujar líneas hacia los vecinos
         Gizmos.color = Color.yellow;
@@ -56,6 +73,25 @@ public class TileNode
         {
             Vector3 neighborPosition = new Vector3(edge.to.gameObject.transform.position.x, edge.to.gameObject.transform.position.y, 0);
             Gizmos.DrawLine(worldPosition, neighborPosition);
+        }
+
+
+         // Mostrar los costos tácticos por cada agente
+        foreach (var tacticalCost in tacticalCosts)
+        {
+            // Crear texto con AgentType y costo
+            string label = $"{tacticalCost.Key}\n{tacticalCost.Value}";
+
+            // Mostrar el texto encima del nodo
+            Handles.Label(
+                worldPosition + Vector3.up , // Ajusta la altura del texto
+                label,
+                new GUIStyle
+                {
+                    fontSize = 12,
+                    normal = new GUIStyleState { textColor = Color.white }
+                }
+            );
         }
     }
 }

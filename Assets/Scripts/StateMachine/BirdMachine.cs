@@ -1,7 +1,9 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class BirdMachine : MonoBehaviour
 {
+    public TileGraphVisualizer graphVisualizer;
     public bool sleeping = false;
     private MovementController movement;
     private GameObject bed,
@@ -14,6 +16,9 @@ public class BirdMachine : MonoBehaviour
 
     void Start()
     {
+        graphVisualizer = GameObject
+            .FindGameObjectWithTag("Map")
+            .GetComponent<TileGraphVisualizer>();
         movement = GetComponent<MovementController>();
         farmer = GameObject.FindGameObjectWithTag("Farmer").GetComponent<FarmerMachine>();
         scareBird = GameObject.FindGameObjectWithTag("ScareBird").GetComponent<ScareBirdMachine>();
@@ -92,7 +97,6 @@ public class BirdMachine : MonoBehaviour
         movement.moveTo(hideSpot.transform);
     }
 
-
     private void MoveToHouse(Transform target)
     {
         Vector3 distance = target.position - transform.position;
@@ -103,7 +107,18 @@ public class BirdMachine : MonoBehaviour
             return;
         }
 
-
+        if (Random.value < 0.02f) // 30% de probabilidad
+            {
+                TileNode currentNode = graphVisualizer.GetNodeAtPosition(
+                    (Vector2Int)graphVisualizer.tilemap.WorldToCell(transform.position)
+                );
+                graphVisualizer.GenerateTacticalPoint(
+                    currentNode,
+                    AgentType.Bird,
+                    10
+                    
+                ); // Ventajoso para el granjero
+            }
 
         movement.moveTo(target);
     }

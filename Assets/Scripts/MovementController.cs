@@ -23,7 +23,7 @@ public class MovementController : MonoBehaviour
     public List<TileNode> path; // Ruta calculada
     private int currentNodeIndex = 0; // Índice del nodo actual
     private Vector2Int lastTargetPosition; // Posición previa del objetivo para detección de cambios
-
+    private AgentTypeUtility agentTypeUtility = new();
     void Start()
     {
         aStar = gameObject.AddComponent<AStar>();
@@ -39,14 +39,15 @@ public class MovementController : MonoBehaviour
         if (target == null)
             return;
         else
-            CalculatePath();
+
+            CalculatePath(agentTypeUtility.GetAgentTypeFromString(gameObject.name));
 
         // Verificar si hay una ruta válida
         if (path != null && currentNodeIndex < path.Count)
         {
             // Moverse al nodo actual
             TileNode currentNode = path[currentNodeIndex];
-            DrawRemainingPath();
+            DrawRemainingPath(path, currentNodeIndex, Color.cyan);
 
             moveToPoint(currentNode);
 
@@ -98,7 +99,7 @@ public class MovementController : MonoBehaviour
         }
     }
 
-    private void CalculatePath()
+    private void CalculatePath(AgentType agentType = AgentType.None)
     {
         // Convertir las posiciones a celdas del Tilemap
         Vector2Int start = (Vector2Int)graphVisualizer.tilemap.WorldToCell(character.position);
@@ -106,7 +107,7 @@ public class MovementController : MonoBehaviour
 
         if (end == lastTargetPos)
         {
-            Debug.Log("No se puede calcular la ruta porque el objetivo es igual al anterior.");
+            // Debug.Log("No se puede calcular la ruta porque el objetivo es igual al anterior.");
             return;
         }
 
@@ -117,24 +118,33 @@ public class MovementController : MonoBehaviour
         lastTargetPos = end;
 
         if (startNode != null && goalNode != null)
-        {
+        {   
+
+            
+
             // Calcular la ruta usando A*
-            path = aStar.FindPath(startNode, goalNode);
+            path = aStar.FindPath(startNode, goalNode, agentType);
+            if (gameObject.name == "Bird") {
+
+            Debug.Log("Calculando Path para: "+ agentType + "--Hasta:" + target.name);
+            printPath(path);
+            }
+          
+
             currentNodeIndex = 0; // Reiniciar el índice de nodo actual
             if (path == null)
             {
-                Debug.Log("No se encontró un camino.");
+                // Debug.Log("No se encontró un camino.");
             }
-            else
-                printPath(path);
+          
         }
         else
         {
-            Debug.Log("Inicio o objetivo no válidos.");
+            // Debug.Log("Inicio o objetivo no válidos.");
         }
     }
 
-    private void DrawRemainingPath()
+    private void DrawRemainingPath(List<TileNode> path, int currentNodeIndex, Color color)
     {
         // Verifica que haya un camino válido
         if (path == null || currentNodeIndex >= path.Count - 1)
@@ -149,7 +159,7 @@ public class MovementController : MonoBehaviour
             Debug.DrawLine(
                 currentNode.gameObject.transform.position,
                 nextNode.gameObject.transform.position,
-                Color.cyan,
+                color,
                 0f // Se dibuja en cada frame
             );
         }
@@ -171,6 +181,7 @@ public class MovementController : MonoBehaviour
 
     private void printPath(List<TileNode> path)
     {
+        if (path==null) return;
         string result = "Camino:\n";
         foreach (TileNode node in path)
         {

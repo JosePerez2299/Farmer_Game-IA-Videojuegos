@@ -94,6 +94,30 @@ public class TileGraphVisualizer : MonoBehaviour
         textMesh.color = Color.white; // Puedes cambiar el color del texto aquí
     }
 
+    public void GenerateTacticalPoint(
+        TileNode node,
+        AgentType agentType,
+        int cost,
+        GameObject visualMarkerPrefab = null
+    )
+    {
+        // Configurar el costo táctico para el agente especificado
+        node.SetTacticalCost(agentType, cost);
+
+        // Crear un marcador visual en la posición del nodo, si se proporciona
+        if (visualMarkerPrefab != null)
+        {
+            GameObject marker = Instantiate(
+                visualMarkerPrefab,
+                node.gameObject.transform.position,
+                Quaternion.identity
+            );
+
+            // Vincular el marcador al nodo (opcional)
+            marker.transform.parent = node.gameObject.transform;
+        }
+    }
+
     void OnDrawGizmos()
     {
         if (nodes == null || nodes.Count == 0 || !draw)
@@ -102,7 +126,6 @@ public class TileGraphVisualizer : MonoBehaviour
         foreach (var node in nodes.Values)
         {
             node.DrawGizmo();
-            
         }
     }
 }
